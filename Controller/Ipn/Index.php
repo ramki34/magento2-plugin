@@ -132,7 +132,7 @@ class Index extends \Magento\Framework\App\Action\Action {
 
 		// Update the order to notifiy that it has been paid
 		$transactionSpeed = \Magento\Framework\App\ObjectManager::getInstance() -> create('Magento\Framework\App\Config\ScopeConfigInterface') -> getValue('payment/bitpay/speed');
-		$this -> _bitpayHelper -> debugData('am here'.$ipn -> status);
+		
 		if ($ipn -> status === 'paid' || $ipn -> status === 'confirmed') {
 
 			$payment = \Magento\Framework\App\ObjectManager::getInstance() -> create('Magento\Sales\Model\Order\Payment') -> setOrder($order);

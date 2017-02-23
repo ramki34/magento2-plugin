@@ -44,9 +44,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function debugData($debugData)
     {
-        if (true === isset($debugData) && false === empty($debugData)) {
+        if($this->isDebug() && !empty($debugData))        
             $this->logger->debug($debugData);
-        }
     }
 
     /**
