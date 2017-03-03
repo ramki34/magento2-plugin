@@ -20,6 +20,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_directory_list;
     protected $logger;
     protected $config;
+    protected $magento_st;
 
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
@@ -29,13 +30,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	/**
      * @param \Magento\Framework\App\Helper\Context $context
      */
-	public function __construct(\Magento\Framework\App\Helper\Context $context,\Bitpay\Core\Model\Method\Bitcoin $bitpayModel,\Magento\Framework\App\Filesystem\DirectoryList $directory_list,\Bitpay\Core\Logger\Logger $logger,\Magento\Config\Model\ResourceModel\Config $config)
+	public function __construct(\Magento\Framework\App\Helper\Context $context,\Bitpay\Core\Model\Method\Bitcoin $bitpayModel,\Magento\Framework\App\Filesystem\DirectoryList $directory_list,\Bitpay\Core\Logger\Logger $logger,\Magento\Config\Model\ResourceModel\Config $config, \Bitpay\Core\Model\MagentoStorage $magento_st)
 	{
 		
 		$this->_bitpayModel = $bitpayModel;
         $this->directory_list = $directory_list;
         $this->logger = $logger;
         $this->config = $config;
+        $this->magento_st=$magento_st;
         parent::__construct($context);
 	}
 
@@ -344,7 +346,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $this->registerAutoloader();
             }
 
-            $this->_keyManager = new \Bitpay\KeyManager(new \Bitpay\Storage\MagentoStorage());
+            $this->_keyManager = new \Bitpay\KeyManager($this->magento_st);
 
             if (false === isset($this->_keyManager) || true === empty($this->_keyManager)) {
                 $this->debugData('[ERROR] In \Bitpay\Core\Helper\Data::getKeyManager(): could not create new BitPay KeyManager object. Cannot continue!');
