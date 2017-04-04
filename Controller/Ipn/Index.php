@@ -17,13 +17,15 @@ class Index extends \Magento\Framework\App\Action\Action {
 	protected $_orderModel;
 
 	protected $_bitpayInvoiceModel;
+	protected $_bitpayPaymentModel;
 
-	public function __construct(\Magento\Framework\App\Action\Context $context, \Bitpay\Core\Helper\Data $_bitpayHelper, \Bitpay\Core\Model\Ipn $_bitpayModel, \Magento\Sales\Model\Order $_orderModel, \Bitpay\Core\Model\Invoice $_bitpayInvoiceModel) {
+	public function __construct(\Magento\Framework\App\Action\Context $context, \Bitpay\Core\Helper\Data $_bitpayHelper, \Bitpay\Core\Model\Ipn $_bitpayModel, \Magento\Sales\Model\Order $_orderModel, \Bitpay\Core\Model\Invoice $_bitpayInvoiceModel,  \Bitpay\Core\Model\Order\Payment $_bitpayPaymentModel) {
 		parent::__construct($context);
 		$this -> _bitpayHelper = $_bitpayHelper;
 		$this -> _bitpayModel = $_bitpayModel;
 		$this -> _orderModel = $_orderModel;
 		$this -> _bitpayInvoiceModel = $_bitpayInvoiceModel;
+		$this -> _bitpayPaymentModel = $_bitpayPaymentModel;
 	}
 
 	/**
@@ -134,8 +136,12 @@ class Index extends \Magento\Framework\App\Action\Action {
 		$transactionSpeed = \Magento\Framework\App\ObjectManager::getInstance() -> create('Magento\Framework\App\Config\ScopeConfigInterface') -> getValue('payment/bitpay/speed');
 		
 		if ($ipn -> status === 'paid' || $ipn -> status === 'confirmed') {
-
-			$payment = \Magento\Framework\App\ObjectManager::getInstance() -> create('Magento\Sales\Model\Order\Payment') -> setOrder($order);
+			try{				
+			$payment = $this -> _bitpayPaymentModel-> setOrder($order);						 			
+			}
+			catch(\Exception $e){				
+				$this -> _bitpayHelper -> debugData("[ERROR] In \Bitpay\Core\Controller\Ipn::indexAction():".$e->getMessage());				
+			}			
 
 			if (true === isset($payment) && false === empty($payment)) {
 				if ($ipn -> status === 'confirmed') {
